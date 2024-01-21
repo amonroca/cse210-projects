@@ -2,18 +2,18 @@ using System;
 
 public class Entry
 {
-    string _date, _promptText, _entryText;
-    string Date
+    private string _date, _promptText, _entryText;
+    public string Date
     {
         get => _date;
         set => _date = value;
     }
-    string PromptText
+    public string PromptText
     {
         get => _promptText;
         set => _promptText = value;
     }
-    string EntryText
+    public string EntryText
     {
         get => _entryText;
         set => _entryText = value;
@@ -21,6 +21,6 @@ public class Entry
 
     public void Display()
     {
-        
+        Console.WriteLine($"Date: {Date} - Prompt: {PromptText} \n{EntryText}\n");
     }
 }
