@@ -1,3 +1,5 @@
+// I have created a library of scriptures using LiteDB, a serverless non-relational database, and the program is choosing one at random to present to the user.
+
 using System;
 
 class Program
