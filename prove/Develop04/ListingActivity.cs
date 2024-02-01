@@ -1,4 +1,4 @@
-public class ListingActivity
+public class ListingActivity : Activity
 {
     private int _count;
     private List<string> _prompts = new List<string>();
@@ -20,6 +20,6 @@ public class ListingActivity
 
     public List<string> GetListFromUser()
     {
-        return [""];
+        return _prompts;
     }
 }
