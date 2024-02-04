@@ -24,11 +24,6 @@ public class Word
         _isHidden = false;
     }
 
-/*     public bool IsHidden
-    {
-        set => _isHidden = value;
-    } */
-
     public bool IsHidden()
     {
         return _isHidden;
