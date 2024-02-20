@@ -8,7 +8,7 @@ public class UrgentTask : Task
 
     public override string GetTaskDetails()
     {
-        return $"[URGENT] [PRIORITY #{_priorityOrder}]{base.Description}";
+        return $"[URGENT] [PRIORITY #{_priorityOrder}] {base.Description}";
     }
 
     public override void Save(TaskList list)

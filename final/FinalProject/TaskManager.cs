@@ -57,59 +57,113 @@ public class TaskManager
 
     public void CreateTask()
     { 
-        Console.WriteLine("\nThe available lists are: ");
+        Console.WriteLine("\nREMINDER: You are not allowed to create tasks in the Completed Tasks list.");
+        Console.WriteLine("You are allowed to cread an Urgent Task only in the Urgent Tasks list.");
+        Console.WriteLine("You are allowed to create a Recurrent Task only in the Today to-do list.");
+        Console.WriteLine("The available lists are: ");
         this.DisplayListsNames();
         Console.Write("In which list would you like to create the task? ");
         int listIndex = int.Parse(Console.ReadLine()) - 1;
+        TaskList taskList = _taskLists[listIndex];
 
-        Console.Write("The types of Tasks are:\n    1. Regular Task\n    2. Urgent Task\n    3. Recurrent Task\nWhich type of task would you like to create? ");
-        string taskType = Console.ReadLine();
-
-        Console.Write("Describe in a few words yur task: ");
-        string taskDescription = Console.ReadLine();
-
-        switch (taskType)
+        if (taskList.Name == "Completed Tasks")
         {
-            case "1":
-                RegularTask regularTask = new RegularTask(taskDescription);
-                _taskLists[listIndex].SetTask(regularTask);
-                break;
+            Console.WriteLine("\nYou are not allowed to create tasks in that list. Please Select another one.");
+        }
+        else
+        {
+            Console.Write("The types of the task are:\n    1. Regular Task\n    2. Urgent Task\n    3. Recurrent Task\nWhich type of task would you like to create? ");
+            string taskType = Console.ReadLine();
 
-            case "2":
-                Console.Write("What is the task priority order? ");
-                int priorityOrder = int.Parse(Console.ReadLine());
-                UrgentTask urgentTask = new UrgentTask(taskDescription, priorityOrder);
-                _taskLists[listIndex].SetTask(urgentTask);
-                break;
+            if (taskList.Name == "Urgent Tasks" && taskType != "2")
+            {
+                Console.WriteLine("\nYou are allowed to create only Urgent Tasks in the Urgent Tasks list.");
+            }
+            else if (taskList.Name != "Urgent Tasks" && taskType == "2")
+            {
+                Console.WriteLine("\nYou are allowed to create Urgent Tasks only in the Urgent Tasks list.");
+            }
+            else if (taskList.Name != "Today" && taskType == "3")
+            {
+                Console.WriteLine("\nYou are allowed to create Recurrent Tasks only in the Today to-do list.");
+            }
+            else
+            {
+                Console.Write("Describe in a few words yur task: ");
+                string taskDescription = Console.ReadLine();
 
-            case "3":
-                RecurrentTask recurrentTask = new RecurrentTask(taskDescription);
-                _taskLists[listIndex].SetTask(recurrentTask);
-                break;
+                switch (taskType)
+                {
+                    case "1":
+                        Console.Write("Would you like to set a due date for this task (yes/no)? ");
+                        string isScheduled = Console.ReadLine().ToLower();
 
-            default:
-                Console.WriteLine("\nInvalid value. Enter a valid option.\n");
-                this.CreateTask();
-                break;
+                        if (isScheduled == "yes")
+                        {
+                            Console.Write("What is the task due date? ");
+                            DateTime dueDate = DateTime.Parse(Console.ReadLine());
+                            RegularTask regularTask = new RegularTask(taskDescription, dueDate);
+                            _taskLists[listIndex].SetTask(regularTask);
+                        }
+                        else
+                        {
+                            RegularTask regularTask = new RegularTask(taskDescription);
+                            _taskLists[listIndex].SetTask(regularTask);
+                        }
+
+                        break;
+
+                    case "2":
+                        Console.Write("What is the task priority order? ");
+                        int priorityOrder = int.Parse(Console.ReadLine());
+                        UrgentTask urgentTask = new UrgentTask(taskDescription, priorityOrder);
+                        _taskLists[listIndex].SetTask(urgentTask);
+                        break;
+
+                    case "3":
+                        RecurrentTask recurrentTask = new RecurrentTask(taskDescription);
+                        _taskLists[listIndex].SetTask(recurrentTask);
+                        break;
+
+                    default:
+                        Console.WriteLine("\nInvalid value. Enter a valid option.\n");
+                        this.CreateTask();
+                        break;
+                }
+            }
         }
     }
 
     public void DeleteTask()
     {
-        // this.DisplayTaskList();
-        Console.WriteLine("\nThe available lists are: ");
+        Console.WriteLine("\nREMINDER: You are not allowed to delete tasks from Completed Tasks list.");
+        Console.WriteLine("The available lists are: ");
         this.DisplayListsNames();
         Console.Write("Which list do you want to see? ");
         int listIndex = int.Parse(Console.ReadLine()) - 1;
         TaskList list = _taskLists[listIndex];
 
-        Console.WriteLine($"\nDisplaying to-do list [{list.Name}]:");
-        list.DisplayTaskList();
+        if (list.Name != "Completed Tasks")
+        {
+            Console.WriteLine($"\nDisplaying to-do list [{list.Name}]:");
+            list.DisplayTaskList();
 
-        Console.Write("Which task do you want to remove? ");
-        int taskIndex = int.Parse(Console.ReadLine()) - 1;
+            if (list.ToDoList.Count > 0)
+            {
+                Console.Write("Which task do you want to remove? ");
+                int taskIndex = int.Parse(Console.ReadLine()) - 1;
 
-        list.RemoveTask(list.GetTask(taskIndex));
+                list.RemoveTask(list.GetTask(taskIndex));
+            }
+            else
+            {
+                Console.WriteLine("\nPlease, select another list.");
+            }
+        }
+        else
+        {
+            Console.WriteLine("\nYou not allowed to remove tasks from that list. Please, select another one.");
+        }
     }
 
     public void CreateList()
@@ -123,16 +177,55 @@ public class TaskManager
 
     public void DeleteList()
     {   
-        Console.WriteLine("\nThe available lists are: ");
-        this.DisplayListsNames();
-        Console.Write("Which list do you want to remove? ");
-        int index = int.Parse(Console.ReadLine()) - 1;
-        _taskLists.Remove(_taskLists[index]);
+        Console.WriteLine();
+        Console.WriteLine("\nREMINDER: You are not allowed to remove the following lists:\n    1. Urgent Tasks\n    2. Completed Tasks\n    3. Today");
+
+        if (_taskLists.Count > 3)
+        {
+            Console.WriteLine("The available lists are: ");
+            this.DisplayListsNames();
+            Console.Write("Which list do you want to remove? ");
+            int index = int.Parse(Console.ReadLine()) - 1;
+            TaskList taskList = _taskLists[index];
+
+            if ((taskList.Name != "Urgent Tasks") && (taskList.Name != "Completed Tasks") && taskList.Name != "Today")
+            {
+                _taskLists.Remove(taskList);
+            }
+            else
+            {
+                Console.WriteLine("\nYou are not allowed to remove that list.");
+            }
+        }
+        else
+        {
+            Console.WriteLine("There is no lists you are allowed to remove.");
+        }
     }
 
     public void MarkTaskAsCompleted()
     {
+        Console.WriteLine("\nThe available lists are: ");
+        this.DisplayListsNames();
+        Console.Write("Which list do you want to see? ");
+        int listIndex = int.Parse(Console.ReadLine()) - 1;
+        TaskList list = _taskLists[listIndex];
 
+        Console.WriteLine($"\nDisplaying to-do list [{list.Name}]:");
+        list.DisplayTaskList();
+
+        Console.Write("Which task did you complete? ");
+        int taskIndex = int.Parse(Console.ReadLine()) - 1;
+
+        Task task = list.GetTask(taskIndex);
+        task.MarkAsCompleted();
+
+        _taskLists.Find(x => x.Name == "Completed Tasks").SetTask(task);
+        // task is not RecurrentTask ? list.RemoveTask(list.GetTask(taskIndex)) : Console.Write("");
+        if (task is not RecurrentTask)
+        {
+            list.RemoveTask(list.GetTask(taskIndex));
+        }
     }
 
     public void DisplayTaskList()
