@@ -9,11 +9,19 @@ public class RecurrentTask : Task
 
     public override void Save(TaskList list)
     {
-
+        RecurrentTaskDAO recurrentTaskDAO = new RecurrentTaskDAO();
+        recurrentTaskDAO.Save(this, list);
     }
 
-    public override void Delete()
+    public override void Delete(TaskList list, int taskIndex)
     {
+        RecurrentTaskDAO recurrentTaskDAO = new RecurrentTaskDAO();
+        recurrentTaskDAO.Delete(this, list, taskIndex);
+    }
 
+    public override void Update(TaskList list, int taskIndex)
+    {
+        RecurrentTaskDAO recurrentTaskDAO = new RecurrentTaskDAO();
+        recurrentTaskDAO.Update(this, list, taskIndex);
     }
 }

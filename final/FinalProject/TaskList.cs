@@ -1,7 +1,10 @@
+using LiteDB;
+
 public class TaskList
 {
     private string _name;
     private List<Task> _toDoList = new List<Task>();
+    private ObjectId _id;
 
     public string Name
     {
@@ -15,9 +18,16 @@ public class TaskList
         set => _toDoList = value;
     }
 
+    public ObjectId Id
+    {
+        get => _id;
+        set => _id = value;
+    }
+
     public TaskList(string name)
     {
         _name = name;
+        _id = ObjectId.NewObjectId();
     }
 
     public Task GetTask(int index)
@@ -30,10 +40,10 @@ public class TaskList
         _toDoList.Add(task);
     }
 
-    public void RemoveTask(Task task)
+/*     public void RemoveTask(Task task)
     {
         _toDoList.Remove(task);
-    }
+    } */
 
     public void DisplayTaskList()
     {
@@ -48,5 +58,17 @@ public class TaskList
         {
             Console.WriteLine($"There is no task in the list to display");
         }
+    }
+
+    public void Save()
+    {
+        TaskListDAO taskListDAO = new TaskListDAO();
+        taskListDAO.Save(this);
+    }
+
+    public void Delete()
+    {
+        TaskListDAO taskListDAO = new TaskListDAO();
+        taskListDAO.Delete(this);
     }
 }

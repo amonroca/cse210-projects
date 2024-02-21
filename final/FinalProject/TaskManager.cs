@@ -4,14 +4,17 @@ public class TaskManager
 
     public void Init()
     {
-        TaskList urgent = new TaskList("Urgent Tasks");
+        /* TaskList urgent = new TaskList("Urgent Tasks");
         _taskLists.Add(urgent);
 
         TaskList completed = new TaskList("Completed Tasks");
         _taskLists.Add(completed);
 
         TaskList today = new TaskList("Today");
-        _taskLists.Add(today);
+        _taskLists.Add(today); */
+
+        TaskListDAO taskListDAO = new TaskListDAO();
+        _taskLists = taskListDAO.LoadAllLists();
 
         Menu menu = new Menu();
         string option;
@@ -103,12 +106,16 @@ public class TaskManager
                             Console.Write("What is the task due date? ");
                             DateTime dueDate = DateTime.Parse(Console.ReadLine());
                             RegularTask regularTask = new RegularTask(taskDescription, dueDate);
+                            regularTask.Save(_taskLists[listIndex]);
                             _taskLists[listIndex].SetTask(regularTask);
+                            Console.WriteLine("\nThe task was created successfully.");
                         }
                         else
                         {
                             RegularTask regularTask = new RegularTask(taskDescription);
+                            regularTask.Save(_taskLists[listIndex]);
                             _taskLists[listIndex].SetTask(regularTask);
+                            Console.WriteLine("\nThe task was created successfully.");
                         }
 
                         break;
@@ -117,12 +124,16 @@ public class TaskManager
                         Console.Write("What is the task priority order? ");
                         int priorityOrder = int.Parse(Console.ReadLine());
                         UrgentTask urgentTask = new UrgentTask(taskDescription, priorityOrder);
+                        urgentTask.Save(_taskLists[listIndex]);
                         _taskLists[listIndex].SetTask(urgentTask);
+                        Console.WriteLine("\nThe task was created successfully.");
                         break;
 
                     case "3":
                         RecurrentTask recurrentTask = new RecurrentTask(taskDescription);
+                        recurrentTask.Save(_taskLists[listIndex]);
                         _taskLists[listIndex].SetTask(recurrentTask);
+                        Console.WriteLine("\nThe task was created successfully.");
                         break;
 
                     default:
@@ -153,7 +164,10 @@ public class TaskManager
                 Console.Write("Which task do you want to remove? ");
                 int taskIndex = int.Parse(Console.ReadLine()) - 1;
 
-                list.RemoveTask(list.GetTask(taskIndex));
+                list.GetTask(taskIndex).Delete(list, taskIndex);
+                list.ToDoList.RemoveAt(taskIndex);
+
+                Console.WriteLine("\nThe task was removed successfully.");
             }
             else
             {
@@ -173,6 +187,9 @@ public class TaskManager
 
         TaskList taskList = new TaskList(listName);
         _taskLists.Add(taskList);
+        taskList.Save();
+
+        Console.WriteLine($"\nTo-do list {taskList.Name} was saved successfully.");
     }
 
     public void DeleteList()
@@ -191,6 +208,8 @@ public class TaskManager
             if ((taskList.Name != "Urgent Tasks") && (taskList.Name != "Completed Tasks") && taskList.Name != "Today")
             {
                 _taskLists.Remove(taskList);
+                taskList.Delete();
+                Console.WriteLine($"\nThe to-do list {taskList.Name} was removed successfully.");
             }
             else
             {
@@ -219,13 +238,16 @@ public class TaskManager
 
         Task task = list.GetTask(taskIndex);
         task.MarkAsCompleted();
+        task.Update(list, taskIndex);
 
         _taskLists.Find(x => x.Name == "Completed Tasks").SetTask(task);
-        // task is not RecurrentTask ? list.RemoveTask(list.GetTask(taskIndex)) : Console.Write("");
+
         if (task is not RecurrentTask)
         {
-            list.RemoveTask(list.GetTask(taskIndex));
+            list.ToDoList.RemoveAt(taskIndex);
         }
+
+        Console.WriteLine("\nThe task was updated successfully. (See the Completed Tasks list)");
     }
 
     public void DisplayTaskList()
